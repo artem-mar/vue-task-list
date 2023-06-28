@@ -35,7 +35,7 @@ export default {
     const tasks = store.state.tasks;
 
     const createTask = () => {
-      const task = { id: Date.now(), name: taskName.value };
+      const task = { id: Date.now(), name: taskName.value, isComplete: false };
       store.commit('addTask', task);
       taskName.value = '';
     };

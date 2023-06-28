@@ -1,8 +1,14 @@
 <template>
   <div class="d-flex justify-content-between align-items-center">
-    {{ task.name }}
+    <a @click="toggleComplete" href="#" class="text-decoration-none block flex-grow-1">
+      <span :class="taskNameStyles">{{ task.name }}</span>
+      
+    </a>
     <div>
-      <button @click="changeEdit" class="btn btn-sm btn-secondary me-2">Edit</button>
+      <button @click="changeEdit" class="btn btn-sm btn-secondary me-2">
+        <span v-if="!isEdit">Edit</span>
+        <span v-if="isEdit">Cancel</span>
+      </button>
       <button @click="deleteTask(task.id)" class="btn btn-sm btn-danger">Delete</button>
     </div>
   </div>
@@ -38,8 +44,10 @@ export default {
     const isEdit = ref(false);
     const newTaskName = ref('');
 
+    const task = computed(() => store.state.tasks.find((t) => t.id === props.taskId));
+
     const updateTask = () => {
-      const updatedTask = { id: props.taskId, name: newTaskName.value };
+      const updatedTask = { ...task.value, name: newTaskName.value };
       store.commit('updateTask', updatedTask);
       newTaskName.value = '';
       isEdit.value = false;
@@ -53,13 +61,27 @@ export default {
       isEdit.value = !isEdit.value;
     };
 
+    const toggleComplete = () => {
+      const isComplete = task.value.isComplete;
+      const updatedTask = { ...task.value, isComplete: !isComplete };
+      store.commit('updateTask', updatedTask);
+    };
+
+    const taskNameStyles = computed(() => ({
+      'text-body': true,
+      'text-decoration-line-through': task.value.isComplete,
+      'text-decoration-none': !task.value.isComplete,
+    }));
+
     return {
-      task: computed(() => store.state.tasks.find((t) => t.id == props.taskId)),
+      task,
       updateTask,
       deleteTask,
       isEdit,
       changeEdit,
       newTaskName,
+      toggleComplete,
+      taskNameStyles,
     };
   },
 };
